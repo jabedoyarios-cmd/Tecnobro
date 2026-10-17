@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tecnobro | Gestión de Taller</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        if (localStorage.getItem('sesionTecnobro') !== 'activa') { window.location.href = "index.html"; }
+    </script>
+    <style>
+        :root { --tb-red: #e63946; --tb-dark: #121212; --tb-bg: #f4f7f6; }
+        body { background-color: var(--tb-bg); font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; margin:0; }
+        .sidebar { width: 280px; background: var(--tb-dark); color: white; padding: 25px; position: fixed; height: 100vh; z-index: 1000; }
+        .main-content { margin-left: 280px; width: 100%; padding: 40px; }
+        .nav-link { color: #888; cursor: pointer; border-radius: 10px; transition: 0.3s; margin-bottom: 8px; padding: 12px; }
+        .nav-link:hover, .nav-link.active { background: var(--tb-red); color: white !important; }
+        .section { display: none; background: white; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .accent-red { color: var(--tb-red); }
+        .status-select { font-size: 0.85rem; font-weight: bold; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar d-flex flex-column">
+        <h3 class="fw-bold mb-4 text-center">TECNO<span class="accent-red">BRO</span></h3>
+        <div class="p-3 bg-secondary bg-opacity-10 rounded-3 mb-4 text-center">
+            <small class="text-muted d-block">SESIÓN:</small>
+            <strong id="labelUser" class="text-white"></strong>
+        </div>
+        <ul class="nav flex-column mb-auto">
+            <li class="nav-item"><a class="nav-link active" id="l-inicio" onclick="verSeccion('inicio')"><i class="fas fa-plus-circle me-2"></i> Nueva Orden</a></li>
+            <li class="nav-item"><a class="nav-link" id="l-pendientes" onclick="verSeccion('pendientes')"><i class="fas fa-tools me-2"></i> En Taller</a></li>
+            <li class="nav-item"><a class="nav-link" id="l-entregados" onclick="verSeccion('entregados')"><i class="fas fa-history me-2"></i> Historial / Cobros</a></li>
+            
+            <hr class="text-secondary">
+            <li class="nav-item"><a class="nav-link" id="l-inventario-local" onclick="verSeccion('inventario-local')"><i class="fas fa-store me-2"></i> Inventario General</a></li>
+
+            <li id="menuAdmin" class="nav-item" style="display:none;">
+                <hr><a class="nav-link text-warning" id="l-tab-admin" onclick="verSeccion('tab-admin')"><i class="fas fa-users-cog me-2"></i> Administrar</a>
+            </li>
+        </ul>
+        <button class="btn btn-outline-danger w-100" onclick="logout()">Salir</button>
+    </div>
+
+    <div class="main-content">
+        <!-- SECCIÓN INICIO -->
+        <div id="inicio" class="section" style="display: block;">
+            <h2 class="fw-bold mb-4">Ingreso de Equipos</h2>
+            <div class="row g-4 text-center">
+                <div class="col-md-4" onclick="abrirForm('Celulares')"><div class="card p-5 border-0 shadow-sm rounded-4"><i class="fas fa-mobile-alt fa-4x mb-3 accent-red"></i><h4>Celulares</h4></div></div>
+                <div class="col-md-4" onclick="abrirForm('Computadores')"><div class="card p-5 border-0 shadow-sm rounded-4"><i class="fas fa-laptop fa-4x mb-3 accent-red"></i><h4>Computadores</h4></div></div>
+                <div class="col-md-4" onclick="abrirForm('Consolas')"><div class="card p-5 border-0 shadow-sm rounded-4"><i class="fas fa-gamepad fa-4x mb-3 accent-red"></i><h4>Consolas</h4></div></div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN FORMULARIO -->
+        <div id="formulario" class="section">
+            <h3 class="fw-bold mb-4">Nueva Orden: <span id="tipoDisp" class="accent-red"></span></h3>
+            <form id="ordenForm" class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-bold">Técnico</label><input type="text" id="tecResponsable" class="form-control bg-light" readonly></div>
+                <div class="col-md-6"><label class="form-label fw-bold">Cliente</label><input list="listaClientes" id="cliente" class="form-control" placeholder="Nombre del cliente" required><datalist id="listaClientes"></datalist></div>
+                <div class="col-md-6"><label class="form-label fw-bold">Marca</label><div class="input-group"><select id="selectMarca" class="form-select" required></select><button class="btn btn-dark" type="button" onclick="nuevaMarca()">+</button></div></div>
+                <div class="col-md-6"><label class="form-label fw-bold">Modelo</label><input type="text" id="equipo" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label fw-bold">¿Cargador?</label><select id="cargador" class="form-select"><option value="NO">NO</option><option value="SÍ">SÍ</option></select></div>
+                <div class="col-md-3"><label class="form-label fw-bold">¿Forro?</label><select id="forro" class="form-select"><option value="NO">NO</option><option value="SÍ">SÍ</option></select></div>
+                <div class="col-md-12"><label class="form-label fw-bold">Falla Reportada</label><textarea id="falla" class="form-control" rows="2" required></textarea></div>
+                <div class="col-12 text-end"><button type="submit" class="btn btn-danger px-5 py-3 shadow fw-bold">GUARDAR ENTRADA</button></div>
+            </form>
+        </div>
+
+        <!-- SECCIÓN INVENTARIO LOCAL (GENERAL) -->
+        <div id="inventario-local" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Inventario <span class="accent-red">General</span></h3>
+                <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modalNuevoProducto">
+                    <i class="fas fa-plus me-2"></i>Nuevo Producto
+                </button>
+            </div>
+            <div class="card p-4 shadow-sm rounded-4 mb-4">
+                <h5 class="fw-bold mb-3">Venta rápida</h5>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Producto</label>
+                        <input type="text" id="ventaBuscar" class="form-control" placeholder="Buscar por nombre..." list="listaProductosVenta" oninput="actualizarDatosVenta()">
+                        <datalist id="listaProductosVenta"></datalist>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Cantidad</label>
+                        <input type="number" id="ventaCantidad" class="form-control" min="1" value="1" oninput="actualizarDatosVenta()">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Stock disponible</label>
+                        <input type="text" id="ventaStock" class="form-control bg-light" readonly placeholder="Seleccione un producto">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Vendedor</label>
+                        <input type="text" id="ventaVendedor" class="form-control bg-light" readonly>
+                    </div>
+                </div>
+                <div class="text-end mt-4">
+                    <button class="btn btn-danger" onclick="venderProducto()"><i class="fas fa-shopping-cart me-2"></i>VENDER PRODUCTO</button>
+                </div>
+            </div>
+            <div id="ventaResumenCard" class="card p-4 shadow-sm rounded-4 mb-4" style="display:none;">
+                <h5 class="fw-bold mb-3">Resumen de venta</h5>
+                <div id="ventaResumen"></div>
+            </div>
+            <div class="input-group mb-4">
+                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" placeholder="Buscar producto en inventario..." onkeyup="filtrarInventarioLocal(this.value)">
+            </div>
+            <div class="table-responsive mb-4">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th>P. Venta</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaInventarioLocal"></tbody>
+                </table>
+            </div>
+            <div class="card p-4 shadow-sm rounded-4">
+                <h5 class="fw-bold mb-3">Historial de ventas</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                                <th>Vendedor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoVentas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="pendientes" class="section">
+            <h3 class="fw-bold mb-4">Equipos en <span class="accent-red">Taller</span></h3>
+            <div class="table-responsive"><table class="table table-hover align-middle"><thead class="table-dark"><tr><th>Cliente / Equipo</th><th>Falla</th><th>Accesorios</th><th style="width: 200px;">Estado Actual</th><th>Acción</th></tr></thead><tbody id="cuerpoPendientes"></tbody></table></div>
+        </div>
+
+        <div id="entregados" class="section">
+            <h3 class="fw-bold mb-4">Historial de Salidas</h3>
+            <table class="table table-striped align-middle"><thead class="table-success"><tr><th>Fecha</th><th>Equipo</th><th>Trabajo</th><th>Cobro</th><th>Técnico</th></tr></thead><tbody id="cuerpoHistorial"></tbody></table>
+        </div>
+
+        <div id="tab-admin" class="section">
+            <div class="d-flex justify-content-between mb-4"><h2 class="fw-bold text-warning">Administrar Cuentas</h2><button class="btn btn-dark" onclick="crearUsuarioAdmin()">+ Nuevo Usuario</button></div>
+            <table class="table table-bordered"><thead><tr><th>Usuario</th><th>Rol</th><th>Órdenes</th><th>Clave</th><th>Acción</th></tr></thead><tbody id="listaUsuarios"></tbody></table>
+        </div>
+    </div>
+
+    <!-- MODALES -->
+    <div class="modal fade" id="modalNuevoProducto" tabindex="-1"><div class="modal-dialog"><div class="modal-content" style="border-radius:20px"><div class="modal-header bg-dark text-white"><h5>Nuevo Producto</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><form id="formInventario"><div class="mb-3"><label class="fw-bold">Nombre</label><input type="text" id="invNombre" class="form-control" required></div><div class="row mb-3"><div class="col-6"><label class="fw-bold">Categoría</label><select id="invCat" class="form-select"><option value="Accesorios">Accesorios</option><option value="Repuestos">Repuestos</option><option value="Varios">Varios</option></select></div><div class="col-6"><label class="fw-bold">Stock</label><input type="number" id="invStock" class="form-control" required></div></div><div class="row"><div class="col-6"><label class="fw-bold">Costo ($)</label><input type="number" id="invCosto" class="form-control"></div><div class="col-6"><label class="fw-bold">Venta ($)</label><input type="number" id="invPrecio" class="form-control" required></div></div><button type="submit" class="btn btn-danger w-100 mt-4 fw-bold">GUARDAR</button></form></div></div></div></div>
+
+    <div class="modal fade" id="modalVentaDetalle" tabindex="-1"><div class="modal-dialog"><div class="modal-content" style="border-radius:20px"><div class="modal-header bg-danger text-white"><h5>Datos de venta</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><div class="mb-3"><label class="fw-bold">Producto</label><input type="text" id="ventaDetalleNombre" class="form-control" readonly></div><div class="row g-3"><div class="col-md-4"><label class="fw-bold">Cantidad</label><input type="number" id="ventaDetalleCantidad" class="form-control" readonly></div><div class="col-md-4"><label class="fw-bold">Precio unidad</label><input type="text" id="ventaDetallePrecio" class="form-control bg-light" readonly></div><div class="col-md-4"><label class="fw-bold">Stock disponible</label><input type="text" id="ventaDetalleStock" class="form-control bg-light" readonly></div></div><div class="mb-3 mt-3"><label class="fw-bold">Nombre del comprador</label><input type="text" id="ventaDetalleComprador" class="form-control"></div><div class="mb-3"><label class="fw-bold">Dirección</label><input type="text" id="ventaDetalleDireccion" class="form-control"></div><div class="mb-3"><label class="fw-bold">Número de contacto</label><input type="text" id="ventaDetalleContacto" class="form-control"></div><div class="mb-3"><label class="fw-bold">Pago</label><select id="ventaDetallePago" class="form-select"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option></select></div></div><div class="modal-footer"><button class="btn btn-danger w-100" onclick="confirmarVentaDetalle()">VENDER</button></div></div></div></div>
+
+    <div class="modal fade" id="modalSalida" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-danger text-white"><h5>Finalizar Reparación</h5></div><div class="modal-body"><label class="fw-bold">Trabajo realizado:</label><textarea id="trabajoRealizado" class="form-control mb-3" required></textarea><label class="fw-bold">Valor cobrado ($):</label><input type="number" id="valorCobrado" class="form-control" required></div><div class="modal-footer"><button class="btn btn-danger w-100" onclick="confirmarSalida()">REGISTRAR SALIDA</button></div></div></div></div>
+
+    <div class="modal fade" id="modalNuevoUsuario" tabindex="-1"><div class="modal-dialog"><div class="modal-content" style="border-radius:20px"><div class="modal-header bg-warning text-dark"><h5>Nuevo Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><form id="formUsuarioAdmin"><div class="mb-3"><label class="fw-bold">Usuario</label><input type="text" id="admUser" class="form-control" required></div><div class="mb-3"><label class="fw-bold">Clave</label><input type="password" id="admPass" class="form-control" required></div><div class="mb-3"><label class="fw-bold">Rol</label><select id="admRole" class="form-select"><option value="tecnico">Técnico</option><option value="admin">Administrador</option></select></div><button type="submit" class="btn btn-dark w-100 mt-3">GUARDAR USUARIO</button></form></div></div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const session = JSON.parse(localStorage.getItem('sessionUser') || 'null');
+        if(!session || !session.u) {
+            localStorage.removeItem('sesionTecnobro');
+            window.location.href = 'index.html';
+        }
+        document.getElementById('labelUser').innerText = session.u.toUpperCase();
+        if(session.role === 'admin') document.getElementById('menuAdmin').style.display = 'block';
+
+        let marcas = JSON.parse(localStorage.getItem('marcas_tecnobro')) || ["Samsung", "Apple", "Huawei", "HP"];
+        let clientesDB = JSON.parse(localStorage.getItem('clientes_tecnobro')) || [];
+        let inventarioDB = JSON.parse(localStorage.getItem('inventario_tecnobro')) || [];
+        let ventasDB = JSON.parse(localStorage.getItem('ventas_tecnobro')) || [];
+        let ordenSeleccionadaId = null;
+
+        function verSeccion(id) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            if(document.getElementById(id)) document.getElementById(id).style.display = 'block';
+            if(document.getElementById('l-'+id)) document.getElementById('l-'+id).classList.add('active');
+
+            if(id === 'pendientes') cargarPendientes();
+            if(id === 'entregados') cargarHistorial();
+            if(id === 'formulario') cargarClientes();
+            if(id === 'tab-admin') cargarUsuarios();
+            if(id === 'inventario-local') cargarInventario();
+        }
+
+        // --- LÓGICA DE INVENTARIO ---
+        document.getElementById('formInventario').onsubmit = function(e) {
+            e.preventDefault();
+            inventarioDB.push({
+                nombre: document.getElementById('invNombre').value,
+                cat: document.getElementById('invCat').value,
+                stock: parseInt(document.getElementById('invStock').value),
+                costo: document.getElementById('invCosto').value,
+                precio: document.getElementById('invPrecio').value
+            });
+            localStorage.setItem('inventario_tecnobro', JSON.stringify(inventarioDB));
+            this.reset();
+            bootstrap.Modal.getInstance(document.getElementById('modalNuevoProducto')).hide();
+            cargarInventario();
+        };
+
+        function cargarInventario() {
+            const tabla = document.getElementById('tablaInventarioLocal');
+            const datalist = document.getElementById('listaProductosVenta');
+            const vendedorField = document.getElementById('ventaVendedor');
+            tabla.innerHTML = ""; datalist.innerHTML = "";
+            if(vendedorField) vendedorField.value = session.u.toUpperCase();
+
+            inventarioDB.forEach((p, i) => {
+                tabla.innerHTML += `<tr><td>${p.nombre}</td><td>${p.cat}</td><td>${p.stock}</td><td class="text-success fw-bold">$${p.precio}</td><td><button class="btn btn-sm btn-danger" onclick="vender(${i})"><i class="fas fa-shopping-cart"></i></button></td></tr>`;
+                datalist.innerHTML += `<option value="${p.nombre}"></option>`;
+            });
+            cargarVentas();
+        }
+
+        function vender(i) {
+            const producto = inventarioDB[i];
+            if(!producto || producto.stock <= 0) {
+                return alert("Sin stock");
+            }
+            abrirModalVentaDetalle(producto.nombre, 1);
+        }
+
+        function filtrarInventarioLocal(v) {
+            const query = v.trim().toLowerCase();
+            document.querySelectorAll('#tablaInventarioLocal tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        function actualizarDatosVenta() {
+            const nombre = document.getElementById('ventaBuscar').value.trim().toLowerCase();
+            const cantidad = parseInt(document.getElementById('ventaCantidad').value, 10) || 1;
+            const producto = inventarioDB.find(p => p.nombre.toLowerCase() === nombre);
+            const stockField = document.getElementById('ventaStock');
+
+            if(producto) {
+                stockField.value = `${producto.stock} disponible`;
+                if(cantidad > producto.stock) {
+                    stockField.value += ' - cantidad mayor al stock';
+                }
+            } else {
+                stockField.value = '';
+            }
+        }
+
+        function registrarVenta(producto, cantidad, comprador, direccion, contacto, pago) {
+            const vendedor = session.u.toUpperCase();
+            producto.stock -= cantidad;
+            const venta = {
+                fecha: new Date().toLocaleString(),
+                nombre: producto.nombre,
+                cantidad,
+                total: cantidad * parseFloat(producto.precio || 0),
+                vendedor,
+                comprador,
+                direccion,
+                contacto,
+                pago
+            };
+            ventasDB.push(venta);
+            localStorage.setItem('inventario_tecnobro', JSON.stringify(inventarioDB));
+            localStorage.setItem('ventas_tecnobro', JSON.stringify(ventasDB));
+            cargarInventario();
+            document.getElementById('ventaStock').value = '';
+            document.getElementById('ventaBuscar').value = '';
+            document.getElementById('ventaCantidad').value = 1;
+            document.getElementById('ventaResumenCard').style.display = 'block';
+            mostrarResumenVenta(venta);
+            alert(`Venta registrada: ${cantidad} unidad(es) de ${producto.nombre}`);
+        }
+
+        function venderProducto() {
+            const nombre = document.getElementById('ventaBuscar').value.trim().toLowerCase();
+            const cantidad = parseInt(document.getElementById('ventaCantidad').value, 10);
+            const producto = inventarioDB.find(p => p.nombre.toLowerCase() === nombre);
+
+            if(!producto) {
+                return alert('Selecciona un producto válido del inventario');
+            }
+            if(!cantidad || cantidad < 1) {
+                return alert('Ingresa una cantidad válida');
+            }
+            if(cantidad > producto.stock) {
+                return alert('No hay suficiente stock disponible');
+            }
+
+            abrirModalVentaDetalle(producto.nombre, cantidad);
+        }
+
+        function abrirModalVentaDetalle(nombre, cantidad) {
+            const producto = inventarioDB.find(p => p.nombre.toLowerCase() === nombre.toLowerCase());
+            if(!producto) return alert('Producto no encontrado');
+
+            document.getElementById('ventaDetalleNombre').value = producto.nombre;
+            document.getElementById('ventaDetalleCantidad').value = cantidad;
+            document.getElementById('ventaDetallePrecio').value = `$${producto.precio}`;
+            document.getElementById('ventaDetalleStock').value = `${producto.stock} disponible`;
+            document.getElementById('ventaDetalleComprador').value = '';
+            document.getElementById('ventaDetalleDireccion').value = '';
+            document.getElementById('ventaDetalleContacto').value = '';
+            document.getElementById('ventaDetallePago').value = 'efectivo';
+
+            const modal = new bootstrap.Modal(document.getElementById('modalVentaDetalle'));
+            modal.show();
+        }
+
+        function confirmarVentaDetalle() {
+            const nombre = document.getElementById('ventaDetalleNombre').value.trim().toLowerCase();
+            const cantidad = parseInt(document.getElementById('ventaDetalleCantidad').value, 10);
+            const comprador = document.getElementById('ventaDetalleComprador').value.trim();
+            const direccion = document.getElementById('ventaDetalleDireccion').value.trim();
+            const contacto = document.getElementById('ventaDetalleContacto').value.trim();
+            const pago = document.getElementById('ventaDetallePago').value;
+            const producto = inventarioDB.find(p => p.nombre.toLowerCase() === nombre);
+            
+            if(!producto) {
+                return alert('Producto no encontrado');
+            }
+            if(!comprador || !direccion || !contacto) {
+                return alert('Completa los datos del comprador');
+            }
+            if(cantidad > producto.stock) {
+                return alert('No hay suficiente stock disponible');
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('modalVentaDetalle')).hide();
+            registrarVenta(producto, cantidad, comprador, direccion, contacto, pago);
+        }
+
+        function mostrarResumenVenta(venta) {
+            const resumen = document.getElementById('ventaResumen');
+            resumen.innerHTML = `
+                <p><strong>Producto:</strong> ${venta.nombre}</p>
+                <p><strong>Cantidad:</strong> ${venta.cantidad}</p>
+                <p><strong>Total:</strong> $${venta.total.toFixed(2)}</p>
+                <p><strong>Vendedor:</strong> ${venta.vendedor}</p>
+                <p><strong>Comprador:</strong> ${venta.comprador}</p>
+                <p><strong>Dirección:</strong> ${venta.direccion}</p>
+                <p><strong>Contacto:</strong> ${venta.contacto}</p>
+                <p><strong>Pago:</strong> ${venta.pago}</p>
+            `;
+        }
+
+
+        function cargarVentas() {
+            const cuerpo = document.getElementById('cuerpoVentas');
+            if(!cuerpo) return;
+            cuerpo.innerHTML = ventasDB.slice().reverse().map(v => `<tr><td>${v.fecha}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td class="text-success">$${v.total.toFixed(2)}</td><td>${v.vendedor}</td></tr>`).join('');
+        }
+
+        function crearUsuarioAdmin() {
+            const modal = new bootstrap.Modal(document.getElementById('modalNuevoUsuario'));
+            modal.show();
+        }
+
+        document.getElementById('formUsuarioAdmin').onsubmit = function(e) {
+            e.preventDefault();
+            const username = document.getElementById('admUser').value.trim();
+            const password = document.getElementById('admPass').value.trim();
+            const role = document.getElementById('admRole').value;
+
+            if(!username || !password) {
+                return alert('Completa usuario y clave');
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if(users.some(u => u.u === username)) {
+                return alert('El usuario ya existe');
+            }
+
+            users.push({ u: username, p: password, role });
+            localStorage.setItem('users', JSON.stringify(users));
+            this.reset();
+            bootstrap.Modal.getInstance(document.getElementById('modalNuevoUsuario')).hide();
+            cargarUsuarios();
+        };
+
+        function cargarUsuarios() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const cuerpo = document.getElementById('listaUsuarios');
+            cuerpo.innerHTML = users.map((u, index) => `
+                <tr>
+                    <td>${u.u}</td>
+                    <td>${u.role}</td>
+                    <td>0</td>
+                    <td>${u.p}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${index})">Eliminar</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function cargarClientes() {
+            const datalist = document.getElementById('listaClientes');
+            if(!datalist) return;
+            datalist.innerHTML = clientesDB.map(c => `<option value="${c}"></option>`).join('');
+        }
+
+        function nuevaMarca() {
+            const marca = prompt('Nueva marca');
+            if(!marca) return;
+            const nombre = marca.trim();
+            if(!nombre) return;
+            if(marcas.includes(nombre)) return alert('Marca ya existe');
+            marcas.push(nombre);
+            localStorage.setItem('marcas_tecnobro', JSON.stringify(marcas));
+            actualizarSelects();
+            alert('Marca agregada correctamente');
+        }
+
+        function prepararSalida(id) {
+            const db = JSON.parse(localStorage.getItem('orders')) || [];
+            const orden = db.find(o => o.id === id);
+            if(!orden) return alert('Orden no encontrada');
+            ordenSeleccionadaId = id;
+            document.getElementById('trabajoRealizado').value = orden.trabajo || '';
+            document.getElementById('valorCobrado').value = orden.cobro || '';
+            const modal = new bootstrap.Modal(document.getElementById('modalSalida'));
+            modal.show();
+        }
+
+        function confirmarSalida() {
+            const trabajo = document.getElementById('trabajoRealizado').value.trim();
+            const valorCobrado = parseFloat(document.getElementById('valorCobrado').value);
+            if(!ordenSeleccionadaId) return alert('Selecciona una orden primero');
+            if(!trabajo) return alert('Describe el trabajo realizado');
+            if(isNaN(valorCobrado) || valorCobrado <= 0) return alert('Ingresa un valor válido');
+            const db = JSON.parse(localStorage.getItem('orders')) || [];
+            const orden = db.find(o => o.id === ordenSeleccionadaId);
+            if(!orden) return alert('Orden no encontrada');
+            orden.estado = 'entregado';
+            orden.trabajo = trabajo;
+            orden.cobro = valorCobrado;
+            localStorage.setItem('orders', JSON.stringify(db));
+            bootstrap.Modal.getInstance(document.getElementById('modalSalida')).hide();
+            ordenSeleccionadaId = null;
+            document.getElementById('trabajoRealizado').value = '';
+            document.getElementById('valorCobrado').value = '';
+            cargarPendientes();
+            cargarHistorial();
+            alert('Salida registrada correctamente');
+        }
+
+        function eliminarUsuario(index) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if(!users[index]) return;
+            if(users[index].u === session.u.toUpperCase() || users[index].u === session.u) {
+                return alert('No puedes eliminar tu propia cuenta');
+            }
+            if(!confirm(`Eliminar usuario ${users[index].u}?`)) return;
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            cargarUsuarios();
+        }
+
+        // --- LÓGICA DE ÓRDENES (REPARACIONES) ---
+        function abrirForm(cat) {
+            document.getElementById('tipoDisp').innerText = cat;
+            document.getElementById('tecResponsable').value = session.u.toUpperCase();
+            actualizarSelects();
+            verSeccion('formulario');
+        }
+
+        function actualizarSelects() {
+            const sm = document.getElementById('selectMarca');
+            sm.innerHTML = '<option value="">-- Marca --</option>';
+            marcas.forEach(m => { sm.innerHTML += `<option value="${m}">${m}</option>`; });
+        }
+
+        document.getElementById('ordenForm').onsubmit = function(e) {
+            e.preventDefault();
+            const cliente = document.getElementById('cliente').value.trim();
+            if(!cliente) return alert('Ingresa el nombre del cliente');
+            if(!clientesDB.includes(cliente)) {
+                clientesDB.push(cliente);
+                localStorage.setItem('clientes_tecnobro', JSON.stringify(clientesDB));
+                cargarClientes();
+            }
+            let db = JSON.parse(localStorage.getItem('orders')) || [];
+            db.push({ 
+                id: Date.now(), cat: document.getElementById('tipoDisp').innerText, cli: cliente, 
+                marca: document.getElementById('selectMarca').value, eq: document.getElementById('equipo').value, 
+                cargador: document.getElementById('cargador').value, forro: document.getElementById('forro').value,
+                fa: document.getElementById('falla').value, tec: session.u, estado: 'pendiente', fecha: new Date().toLocaleDateString() 
+            });
+            localStorage.setItem('orders', JSON.stringify(db));
+            this.reset(); verSeccion('pendientes');
+        };
+
+        function cargarPendientes() {
+            const db = JSON.parse(localStorage.getItem('orders')) || [];
+            const cuerpo = document.getElementById('cuerpoPendientes');
+            cuerpo.innerHTML = db.filter(o => o.estado === 'pendiente').map(o => `<tr><td><b>${o.cli}</b><br>${o.marca} ${o.eq}</td><td>${o.fa}</td><td>Carg: ${o.cargador}</td><td><select class="form-select status-select bg-light"><option>En revisión</option></select></td><td><button class="btn btn-sm btn-success" onclick="prepararSalida(${o.id})"><i class="fas fa-check"></i></button></td></tr>`).join('');
+        }
+
+        function cargarHistorial() {
+            const db = JSON.parse(localStorage.getItem('orders')) || [];
+            document.getElementById('cuerpoHistorial').innerHTML = db.filter(o => o.estado === 'entregado').map(o => `<tr><td>${o.fecha}</td><td>${o.eq}</td><td>${o.trabajo}</td><td class="text-success">$${o.cobro}</td><td>${o.tec}</td></tr>`).join('');
+        }
+
+        // Inicializar listas adicionales
+        cargarClientes();
+        actualizarSelects();
+
+        function logout() {
+            localStorage.removeItem('session');
+            localStorage.removeItem('sessionUser');
+            localStorage.removeItem('sesionTecnobro');
+             window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
