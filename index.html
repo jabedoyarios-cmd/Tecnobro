@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tecnobro | Servicio Técnico Profesional</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --mcd-red: #DA291C;
+            --mcd-yellow: #000000;
+            --dark-gray: #292929;
+        }
+
+        body { font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; }
+
+        /* Navbar Estilo McDonald's: Limpio y con color acento */
+        .navbar { background: white; border-bottom: 4px solid var(--mcd-yellow); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .navbar-brand { font-weight: 900; font-size: 1.8rem; color: var(--dark-gray) !important; }
+        .accent-red { color: var(--mcd-red); }
+
+        /* Redes Sociales en el Header */
+        .social-header a { color: var(--dark-gray); font-size: 1.2rem; margin-left: 15px; transition: 0.3s; }
+        .social-header a:hover { color: var(--mcd-red); }
+
+        /* Pestañas de Servicios Redondeadas */
+        .nav-pills .nav-link {
+            color: var(--dark-gray);
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 12px 25px;
+            margin: 0 5px;
+            border: 2px solid transparent;
+        }
+        .nav-pills .nav-link.active {
+            background-color: var(--mcd-red) !important;
+            color: white !important;
+            box-shadow: 0 5px 15px rgba(218, 41, 28, 0.4);
+        }
+
+        .service-card {
+            background: white;
+            padding: 40px;
+            border-radius: 40px; /* Estilo muy redondeado */
+            margin-top: 30px;
+            border: 1px solid #eee;
+        }
+
+        .gallery-card {
+            background: #fff;
+            border-radius: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .gallery-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        .gallery-card .gallery-caption {
+            padding: 15px;
+            font-weight: 700;
+            color: var(--dark-gray);
+            text-align: center;
+        }
+
+        /* Botones Estilo Botón McDonald's */
+        .btn-mcd {
+            background-color: var(--mcd-red);
+            color: white;
+            border-radius: 50px;
+            font-weight: 900;
+            padding: 10px 30px;
+            text-transform: uppercase;
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-mcd:hover { background-color: #b31d14; color: white; transform: scale(1.05); }
+
+        /* WhatsApp Flotante */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        footer { background: var(--dark-gray); color: white; padding: 40px 0; }
+        .social-footer a {
+            color: white;
+            font-size: 2rem;
+            margin: 0 15px;
+            transition: 0.3s;
+        }
+        .social-footer a:hover { color: var(--mcd-yellow); }
+    </style>
+</head>
+<body>
+
+    <a href="https://api.whatsapp.com/send?phone=573113374198&text=Hola%20quiero%20cotizar" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">TECNO<span class="accent-red">BRO</span></a>
+            
+            <div class="d-flex align-items-center order-lg-last">
+                <div class="social-header d-none d-md-block me-3">
+                    <a href="https://www.tiktok.com/@tiendatecnobro" target="_blank"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.instagram.com/tiendatecnobro/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/people/Tecnobro-Tienda-Tecnol%C3%B3gica/61561181826641/?sk=about" target="_blank"><i class="fab fa-facebook"></i></a>
+                </div>
+                <a href="login.html" class="btn btn-mcd">LOGIN</a>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-4">
+                    <li class="nav-item"><a class="nav-link fw-bold" href="#">INICIO</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" href="#servicios">SERVICIOS</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" href="#contacto">CONTACTO</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-4" id="servicios">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-black">¿QUÉ VAMOS A <span class="accent-red">REPARAR?</span></h1>
+            <p class="lead">Calidad y rapidez en un solo lugar.</p>
+        </div>
+
+        <ul class="nav nav-pills justify-content-center" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#cel">📱 CELULARES</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pc">💻 COMPUTADORES</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#game">🎮 CONSOLAS</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="cel">
+                <div class="service-card text-center">
+                    <h2 class="fw-bold">Reparación de Celulares</h2>
+                    <p>Cambio de visores, pantallas originales, y reparación de placas. ¡Tu móvil listo en tiempo récord!</p>
+                    <a href="https://api.whatsapp.com/send?phone=573113374198&text=Hola%20quiero%20cotizar" target="_blank" rel="noopener noreferrer" class="btn btn-mcd mt-3">Cotizar por WhatsApp</a>
+                    <div class="row g-3 mt-4 justify-content-center">
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local1.jpg" alt="Cliente revisando celular en el local">
+                                <div class="gallery-caption">Nuestro local</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local2.jpg" alt="Reparación de celular en proceso">
+                                <div class="gallery-caption">Reparaciones reales</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local3.jpg" alt="Equipo de técnicos trabajando">
+                                <div class="gallery-caption">Equipo profesional</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pc">
+                <div class="service-card text-center">
+                    <h2 class="fw-bold">Mantenimiento de Computadores</h2>
+                    <p>Limpieza física, cambio de pasta térmica y repotenciación con discos SSD. ¡Vuela con tu PC!</p>
+                    <a href="https://api.whatsapp.com/send?phone=573113374198&text=Hola%20quiero%20cotizar" target="_blank" rel="noopener noreferrer" class="btn btn-mcd mt-3">Cotizar por WhatsApp</a>
+                    <div class="row g-3 mt-4 justify-content-center">
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local1.jpg" alt="Cliente revisando computador en el local">
+                                <div class="gallery-caption">Nuestra sala técnica</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local2.jpg" alt="Mantenimiento de computador en el taller">
+                                <div class="gallery-caption">Reparación en acción</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local3.jpg" alt="Computador listo para entregar">
+                                <div class="gallery-caption">Producto final</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="game">
+                <div class="service-card text-center">
+                    <h2 class="fw-bold">Servicio para Consolas</h2>
+                    <p>Especialistas en PlayStation, Xbox y Nintendo. Solucionamos problemas de encendido y mantenimiento.</p>
+                    <a href="https://api.whatsapp.com/send?phone=573113374198&text=Hola%20quiero%20cotizar" target="_blank" rel="noopener noreferrer" class="btn btn-mcd mt-3">Cotizar por WhatsApp</a>
+                    <div class="row g-3 mt-4 justify-content-center">
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local1.jpg" alt="Vitrina del negocio">
+                                <div class="gallery-caption">Vista del local</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local2.jpg" alt="Trabajando en consola">
+                                <div class="gallery-caption">Servicio garantizado</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="gallery-card">
+                                <img src="images/local3.jpg" alt="Consola reparada lista para cliente">
+                                <div class="gallery-caption">Entrega profesional</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5" id="contacto">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-4">¡SÍGUENOS EN NUESTRAS REDES!</h2>
+            <div class="social-footer mb-4">
+                <a href="https://www.tiktok.com/@tiendatecnobro" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/tiendatecnobro/" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/people/Tecnobro-Tienda-Tecnol%C3%B3gica/61561181826641/?sk=about" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i></a>
+            </div>
+            <hr class="my-4" style="background-color: #555;">
+            <p class="mb-0 fw-bold">© 2026 TECNOBRO - ANDALUCÍA, VALLE</p>
+            <p class="small text-muted">Todos los derechos registrados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+</body>
+</html>
